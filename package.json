@@ -1,0 +1,27 @@
+{
+  "name": "best_ever_employee_tracker",
+  "version": "1.0.0",
+  "description": "employee tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beaunaturale/Best_Ever_Employee_Tracker.git"
+  },
+  "keywords": [
+    "eployee",
+    "tracker"
+  ],
+  "author": "Beau Hillier",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beaunaturale/Best_Ever_Employee_Tracker/issues"
+  },
+  "homepage": "https://github.com/beaunaturale/Best_Ever_Employee_Tracker#readme",
+  "dependencies": {
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.3.1"
+  }
+}
