@@ -11,7 +11,7 @@
     "url": "git+https://github.com/beaunaturale/Best_Ever_Employee_Tracker.git"
   },
   "keywords": [
-    "eployee",
+    "employee",
     "tracker"
   ],
   "author": "Beau Hillier",
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/beaunaturale/Best_Ever_Employee_Tracker#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
     "inquirer": "^8.2.4",
     "mysql2": "^3.3.1"
   }

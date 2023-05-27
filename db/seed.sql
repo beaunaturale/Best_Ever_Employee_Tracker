@@ -27,6 +27,6 @@ VALUES ('John', 'Doe', 1, NULL)
        ('Tom', 'Allen', 8, 7)
 
 
--- acceptance criteria states, view employee should dispaly, 
+-- acceptance criteria states, view employee should display, 
 -- first_name, last_name, title, department, salary, and manager?
 -- this is different than illustrated schema table.
