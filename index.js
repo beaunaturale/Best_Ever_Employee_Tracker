@@ -115,6 +115,14 @@ const newEmp = async () => {
 
 // Add a role
 const newRole = async () => {
+  const [rows] = await db.promise().query('SELECT department_name, id FROM department')
+  
+  const organizedInfo = rows.map(index => {
+    return {
+      name: index.department_name,
+      value: index.id
+    }
+  })
   inquirer.prompt([
     {
       message: "What is new role title?",
