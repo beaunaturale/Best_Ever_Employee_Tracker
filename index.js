@@ -76,6 +76,15 @@ const newDept = async () => {
 
 // add an employee
 const newEmp = async () => {
+  const [rows] = await db.promise().query('SELECT title, id FROM role')
+  
+  const organizedInfo = rows.map(index => {
+    return {
+      name: index.title,
+      value: index.id
+    }
+  })
+
   inquirer.prompt([
     {
       message: "What is new employee's first name?",
