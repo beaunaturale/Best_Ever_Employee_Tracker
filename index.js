@@ -76,11 +76,18 @@ const newDept = async () => {
 
 // add an employee
 const newEmp = async () => {
-  const [rows] = await db.promise().query('SELECT title, id FROM role')
+  const [rows] = await db.promise().query('SELECT title, id FROM role', 'SELECT first_name last_name, id FROM employee')
   
-  const organizedInfo = rows.map(index => {
+  const organizedInfoTitle = rows.map(index => {
     return {
       name: index.title,
+      value: index.id
+    }
+  })
+  
+  const organizedInfoManager = rows.map(index => {
+    return {
+      name: index.manager,
       value: index.id
     }
   })
@@ -99,13 +106,13 @@ const newEmp = async () => {
     {
       message: "What is new employee's role?",
       type: 'list',
-      choices: [],
+      choices: organizedInfoTitle,
       name: 'newEmpRole'
     },
     {
       message: "Who is new employee's manager?",
       type: 'list',
-      choices: [],
+      choices: organizedInfoManager,
       name: 'newEmpManager'
     }
   ]).then(answers => {
@@ -113,7 +120,7 @@ const newEmp = async () => {
     INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES (?, ?, ?, ?)`
 
-    db.query(sqlQuery, [answers.FirstName, answers.newLastName, answers.newEmpRole, answers.newEmpManager], (err, data) => {
+    db.query(sqlQuery, [answers.newFirstName, answers.newLastName, answers.newEmpRole, answers.newEmpManager], (err, data) => {
       if (err) throw err;
       console.log('added a new employee! \n')
 
@@ -146,7 +153,7 @@ const newRole = async () => {
     {
       message: 'department_id?',
       type: 'list',
-      choices: [],
+      choices: organizedInfo,
       name: 'newDeptId'
     }
   ]).then(answers => {
