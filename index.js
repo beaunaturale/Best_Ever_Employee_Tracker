@@ -23,7 +23,6 @@ const chooseRequest = () => {
     .then((data) => {
       const { request } = data;
       console.log(request);
-      //   Switch case
       switch (request) {
         case 'Add a Department':
           newDepartment();
@@ -74,7 +73,6 @@ const newDepartment = async () => {
   })
 }
 
-// add an employee
 const newEmployee = async () => {
   const [titleRows] = await db.promise().query('SELECT title, id FROM role')
 
@@ -130,7 +128,6 @@ const newEmployee = async () => {
   })
 }
 
-// Add a role
 const newRole = async () => {
   const [titleRows] = await db.promise().query('SELECT department_name, id FROM department')
 
@@ -171,7 +168,6 @@ const newRole = async () => {
   })
 }
 
-// Update an employees role
 const updateEmployeeRole = async () => {
   const [employeeRows] = await db.promise().query('SELECT CONCAT_WS(" ", first_name, last_name) AS employee, id FROM employee')
 
@@ -219,7 +215,7 @@ const updateEmployeeRole = async () => {
     })
   })
 }
-// View All Departments
+
 const viewDepartments = () => {
   const sqlQuery = `
   SELECT *
@@ -234,7 +230,6 @@ const viewDepartments = () => {
   })
 }
 
-// View All Roles
 const viewRoles = () => {
   const sqlQuery = `
   SELECT role.id, title, salary, department_name
@@ -251,7 +246,6 @@ const viewRoles = () => {
   })
 }
 
-// View All employees
 const viewEmployees = () => {
   const sqlQuery = `
   SELECT employee.id, first_name, last_name, title, salary, manager_id
@@ -267,9 +261,5 @@ const viewEmployees = () => {
     chooseRequest()
   })
 }
-
-
-
-
 
 chooseRequest();
