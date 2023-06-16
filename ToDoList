@@ -12,3 +12,31 @@ View All Employees
         
 View All Roles
         
+
+        To fix the error, make sure that the organizedInfo array passed as the choices property in the "department_id" prompt has valid values. Double-check that the query SELECT department_name, id FROM department in the newRole function is returning the expected data.
+Pseudo code to modify and correct the error
+Make sure to arrange these steps in the correct order within your newRole function.
+1. Execute the db.promise().query function to fetch the department data from the database.
+2. Organize the department data for the prompt choices.
+3. Prompt the user for new role details like you have.
+4. Insert the new role into the database.
+5. Display a success message.
+6. Handle any errors that occur during the execution.
+7. Finally, call the chooseRequest function to display the main prompt for further actions.
+Here is a break down and explanation of these changes.
+1. Error handling should be implemented using try-catch blocks to catch any errors that may occur during the database query or the inquirer prompt.
+    ◦ This is done to handle potential errors that may arise during the execution of the code inside the try block.
+    ◦ If an error occurs, it will be caught in the catch block, allowing you to handle and display the error message.
+2. The inquirer.prompt function should be awaited to ensure the prompt is fully completed before proceeding.
+    ◦ By using await before inquirer.prompt, the execution of the code is paused until the user completes the prompt.
+    ◦ This ensures that the answers provided by the user are available for further processing.
+3. The database query should be executed using the db.promise().query function to utilize promises and async/await syntax.
+    ◦ The db.promise().query function is an example of utilizing promises with database queries.
+    ◦ It returns a promise that can be resolved using await or by chaining .then().
+4. The db.query function in the INSERT statement should be changed to db.promise().query.
+    ◦ The original code used db.query for executing the SQL query, but it does not return a promise that can be awaited.
+    ◦ By using db.promise().query, you can await the query execution, ensuring that it completes before proceeding to the next steps.
+5. The chooseRequest function should be called in the finally block to ensure that it's executed whether an error occurs or not.
+    ◦ The finally block is a part of the try-catch structure and is always executed, regardless of whether an error occurred or not.
+    ◦ By calling chooseRequest in the finally block, it ensures that the main prompt for further actions is displayed after completing the current action, regardless of any errors that may have occurred.
+These changes will help improve the error handling and control flow of the code, ensuring that the prompt is fully completed before proceeding and that the chooseRequest function is always called to display the main prompt for further actions and should correct your error.

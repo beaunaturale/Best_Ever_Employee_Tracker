@@ -26,22 +26,22 @@ const chooseRequest = () => {
       //   Switch case
       switch (request) {
         case 'Add a Department':
-          newDept();
+          newDepartment();
           break;
         case 'Add an Employee':
-          newEmp();
+          newEmployee();
           break;
         case 'Add a Role':
           newRole();
           break;
         case 'Update Employees Role':
-          updateEmpRole();
+          updateEmployeeRole();
           break;
         case 'View All Departments':
-          viewDepts();
+          viewDepartments();
           break;
         case 'View All Employees':
-          viewEmps();
+          viewEmployees();
           break;
         case 'View All Roles':
           viewRoles();
@@ -53,7 +53,7 @@ const chooseRequest = () => {
     })
 }
 
-const newDept = async () => {
+const newDepartment = async () => {
   inquirer.prompt([
     {
       message: "What is the name of the new Department?",
@@ -75,7 +75,24 @@ const newDept = async () => {
 }
 
 // add an employee
-const newEmp = async () => {
+const newEmployee = async () => {
+  const [titleRows] = await db.promise().query('SELECT title, id FROM role')
+
+  const organizedTitleInfo = titleRows.map(index => {
+    return {
+      name: index.title,
+      value: index.id
+    }
+  })
+  const [managerRows] = await db.promise().query('SELECT CONCAT_WS(" ", first_name, last_name) AS manager, id FROM employee')
+
+  const organizedManagerInfo = managerRows.map(index => {
+    return {
+      name: index.manager,
+      value: index.id
+    }
+  })
+
   inquirer.prompt([
     {
       message: "What is new employee's first name?",
@@ -90,13 +107,13 @@ const newEmp = async () => {
     {
       message: "What is new employee's role?",
       type: 'list',
-      choices: [],
+      choices: organizedTitleInfo,
       name: 'newEmpRole'
     },
     {
       message: "Who is new employee's manager?",
       type: 'list',
-      choices: [],
+      choices: organizedManagerInfo,
       name: 'newEmpManager'
     }
   ]).then(answers => {
@@ -104,9 +121,9 @@ const newEmp = async () => {
     INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES (?, ?, ?, ?)`
 
-    db.query(sqlQuery, [answers.FirstName, answers.newLastName, answers.newEmpRole, answers.newEmpManager], (err, data) => {
+    db.query(sqlQuery, [answers.newFirstName, answers.newLastName, answers.newEmpRole, answers.newEmpManager], (err, data) => {
       if (err) throw err;
-      console.log('added a new employee! \n')
+      console.log(data, 'added a new employee! \n')
 
       chooseRequest()
     })
@@ -115,9 +132,9 @@ const newEmp = async () => {
 
 // Add a role
 const newRole = async () => {
-  const [rows] = await db.promise().query('SELECT department_name, id FROM department')
-  
-  const organizedInfo = rows.map(index => {
+  const [titleRows] = await db.promise().query('SELECT department_name, id FROM department')
+
+  const organizedTitleInfo = titleRows.map(index => {
     return {
       name: index.department_name,
       value: index.id
@@ -137,7 +154,7 @@ const newRole = async () => {
     {
       message: 'department_id?',
       type: 'list',
-      choices: [],
+      choices: organizedTitleInfo,
       name: 'newDeptId'
     }
   ]).then(answers => {
@@ -155,36 +172,64 @@ const newRole = async () => {
 }
 
 // Update an employees role
-const updateEmpRole = async () => {
-  try {
-    const res = await inquirer.prompt([
-      {
-        type: "list",
-        name: "emp_id",
-        message: "What is the Employee do you want to update?",
-        choices: empArr,
-        loop: false,
-      },
-      {
-        type: "list",
-        name: 'role_id',
-        message: "What is the Employees Role?",
-        choices: roleArr,
-        loop: false,
-      }
-    ])
+const updateEmployeeRole = async () => {
+  const [employeeRows] = await db.promise().query('SELECT CONCAT_WS(" ", first_name, last_name) AS employee, id FROM employee')
 
-    const name = res;
+  const organizedEmployeeInfo = employeeRows.map(index => {
+    return {
+      name: index.employee,
+      value: index.id
+    }
+  })
+  const [titleRows] = await db.promise().query('SELECT title, id FROM role')
 
-    await db.query('UPDATE employee_role SET');
-    console.log(`Update ${name.name} from the database`);
-  } catch (error) {
-    console.error(error);
-  }
+  const organizedRoleInfo = titleRows.map(index => {
+    return {
+      name: index.title,
+      value: index.id
+    }
+  })
+
+  inquirer.prompt([
+    {
+      message: "What is the Employee do you want to update?",
+      type: "list",
+      choices: organizedEmployeeInfo,
+      name: "emp_id",
+      loop: false,
+    },
+    {
+      message: "What is the Employees Role?",
+      type: "list",
+      choices: organizedRoleInfo,
+      name: 'role_id',
+      loop: false,
+    }
+  ]).then(answers => {
+    const sqlQuery = `
+        UPDATE employee (emp_id, role_id)
+        VALUES (?, ?)`
+
+    db.query(sqlQuery, [answers.emp_id, answers.role_id], (err, data) => {
+      if (err) throw err;
+      console.log('Updated employee role! \n')
+
+      chooseRequest()
+    })
+  })
 }
 
+//     const name = res;
+
+//     await db.query('UPDATE employee_role SET');
+//     console.log(`Update ${name.name} from the database`);
+//   }) catch (error) {
+//     console.error(error);
+//   }
+// }
+
 // View All Departments
-const viewDepts = () => {
+const viewDepartments = () => {
   const sqlQuery = `
   SELECT *
   FROM department`
@@ -216,7 +261,7 @@ const viewRoles = () => {
 }
 
 // View All employees
-const viewEmps = () => {
+const viewEmployees = () => {
   const sqlQuery = `
   SELECT employee.id, first_name, last_name, title, salary, manager_id
   FROM employee
