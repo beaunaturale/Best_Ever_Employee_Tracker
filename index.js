@@ -207,10 +207,11 @@ const updateEmployeeRole = async () => {
     }
   ]).then(answers => {
     const sqlQuery = `
-        UPDATE employee (emp_id, role_id)
-        VALUES (?, ?)`
+        UPDATE employee 
+        Set role_id = ?
+        WHERE id = ?`
 
-    db.query(sqlQuery, [answers.emp_id, answers.role_id], (err, data) => {
+    db.query(sqlQuery, [answers.role_id, answers.emp_id], (err, data) => {
       if (err) throw err;
       console.log('Updated employee role! \n')
 
@@ -218,16 +219,6 @@ const updateEmployeeRole = async () => {
     })
   })
 }
-
-//     const name = res;
-
-//     await db.query('UPDATE employee_role SET');
-//     console.log(`Update ${name.name} from the database`);
-//   }) catch (error) {
-//     console.error(error);
-//   }
-// }
-
 // View All Departments
 const viewDepartments = () => {
   const sqlQuery = `
