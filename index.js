@@ -8,13 +8,13 @@ const chooseRequest = () => {
       name: 'request',
       message: 'What would you like to do?',
       choices: [
-        'Add a Department',
-        'Add an Employee',
-        'Add a Role',
-        'Update Employees Role',
         'View All Departments',
-        'View All Employees',
         'View All Roles',
+        'View All Employees',
+        'Add a Department',
+        'Add a Role',
+        'Add an Employee',
+        'Update Employees Role',
       ],
       loop: false,
     },
@@ -24,32 +24,78 @@ const chooseRequest = () => {
       const { request } = data;
       console.log(request);
       switch (request) {
-        case 'Add a Department':
-          newDepartment();
-          break;
-        case 'Add an Employee':
-          newEmployee();
-          break;
-        case 'Add a Role':
-          newRole();
-          break;
-        case 'Update Employees Role':
-          updateEmployeeRole();
-          break;
         case 'View All Departments':
           viewDepartments();
+          break;
+        case 'View All Roles':
+          viewRoles();
           break;
         case 'View All Employees':
           viewEmployees();
           break;
-        case 'View All Roles':
-          viewRoles();
+        case 'Add a Department':
+          newDepartment();
+          break;
+        case 'Add a Role':
+          newRole();
+          break;
+        case 'Add an Employee':
+          newEmployee();
+          break;
+        case 'Update Employees Role':
+          updateEmployeeRole();
           break;
 
         default:
           break;
       }
     })
+}
+
+const viewDepartments = () => {
+  const sqlQuery = `
+  SELECT *
+  FROM department`
+
+  db.query(sqlQuery, (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    console.log("\n");
+
+    chooseRequest()
+  })
+}
+
+const viewRoles = () => {
+  const sqlQuery = `
+  SELECT role.id, title, salary, department_name
+  FROM role
+  JOIN department
+  ON department_id = department.id`
+
+  db.query(sqlQuery, (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    console.log("\n");
+
+    chooseRequest()
+  })
+}
+
+const viewEmployees = () => {
+  const sqlQuery = `
+  SELECT employee.id, first_name, last_name, title, salary, manager_id
+  FROM employee
+  JOIN role
+  ON role_id = role.id`
+
+  db.query(sqlQuery, (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    console.log("\n");
+
+    chooseRequest()
+  })
 }
 
 const newDepartment = async () => {
@@ -67,6 +113,46 @@ const newDepartment = async () => {
     db.query(sqlQuery, [answers.newDept], (err, data) => {
       if (err) throw err;
       console.log('added a new department! \n')
+
+      chooseRequest()
+    })
+  })
+}
+
+const newRole = async () => {
+  const [titleRows] = await db.promise().query('SELECT department_name, id FROM department')
+
+  const organizedTitleInfo = titleRows.map(index => {
+    return {
+      name: index.department_name,
+      value: index.id
+    }
+  })
+  inquirer.prompt([
+    {
+      message: "What is new role title?",
+      type: 'input',
+      name: 'newRole'
+    },
+    {
+      message: "What is new role salary?",
+      type: 'input',
+      name: 'newSalary'
+    },
+    {
+      message: 'department_id?',
+      type: 'list',
+      choices: organizedTitleInfo,
+      name: 'newDeptId'
+    }
+  ]).then(answers => {
+    const sqlQuery = `
+    INSERT INTO role (title, salary, department_id)
+    VALUES (?, ?, ?)`
+
+    db.query(sqlQuery, [answers.newRole, answers.newSalary, answers.newDeptId], (err, data) => {
+      if (err) throw err;
+      console.log('added a new role! \n')
 
       chooseRequest()
     })
@@ -128,46 +214,6 @@ const newEmployee = async () => {
   })
 }
 
-const newRole = async () => {
-  const [titleRows] = await db.promise().query('SELECT department_name, id FROM department')
-
-  const organizedTitleInfo = titleRows.map(index => {
-    return {
-      name: index.department_name,
-      value: index.id
-    }
-  })
-  inquirer.prompt([
-    {
-      message: "What is new role title?",
-      type: 'input',
-      name: 'newRole'
-    },
-    {
-      message: "What is new role salary?",
-      type: 'input',
-      name: 'newSalary'
-    },
-    {
-      message: 'department_id?',
-      type: 'list',
-      choices: organizedTitleInfo,
-      name: 'newDeptId'
-    }
-  ]).then(answers => {
-    const sqlQuery = `
-    INSERT INTO role (title, salary, department_id)
-    VALUES (?, ?, ?)`
-
-    db.query(sqlQuery, [answers.newRole, answers.newSalary, answers.newDeptId], (err, data) => {
-      if (err) throw err;
-      console.log('added a new role! \n')
-
-      chooseRequest()
-    })
-  })
-}
-
 const updateEmployeeRole = async () => {
   const [employeeRows] = await db.promise().query('SELECT CONCAT_WS(" ", first_name, last_name) AS employee, id FROM employee')
 
@@ -213,52 +259,6 @@ const updateEmployeeRole = async () => {
 
       chooseRequest()
     })
-  })
-}
-
-const viewDepartments = () => {
-  const sqlQuery = `
-  SELECT *
-  FROM department`
-
-  db.query(sqlQuery, (err, data) => {
-    if (err) throw err;
-    console.table(data);
-    console.log("\n");
-
-    chooseRequest()
-  })
-}
-
-const viewRoles = () => {
-  const sqlQuery = `
-  SELECT role.id, title, salary, department_name
-  FROM role
-  JOIN department
-  ON department_id = department.id`
-
-  db.query(sqlQuery, (err, data) => {
-    if (err) throw err;
-    console.table(data);
-    console.log("\n");
-
-    chooseRequest()
-  })
-}
-
-const viewEmployees = () => {
-  const sqlQuery = `
-  SELECT employee.id, first_name, last_name, title, salary, manager_id
-  FROM employee
-  JOIN role
-  ON role_id = role.id`
-
-  db.query(sqlQuery, (err, data) => {
-    if (err) throw err;
-    console.table(data);
-    console.log("\n");
-
-    chooseRequest()
   })
 }
 
